@@ -1,0 +1,41 @@
+{
+  "name": "testenc",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "ts-node app.ts",
+    "eslint": "eslint . --fix --ext .ts",
+    "lint:tsc": "tsc --noEmit --incremental false",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^15.3.0",
+    "amqplib": "^0.7.1",
+    "bs58": "^4.0.1",
+    "js-sha256": "^0.9.0",
+    "koinos-types2": "^1.2.0",
+    "leveldown": "^6.0.0",
+    "ripemd160": "^2.0.2",
+    "secp256k1": "^4.0.2"
+  },
+  "devDependencies": {
+    "@tsconfig/node10": "^1.0.7",
+    "@tsconfig/node14": "^1.0.0",
+    "@types/amqplib": "^0.5.17",
+    "@types/bs58": "^4.0.1",
+    "@types/leveldown": "^4.0.2",
+    "@types/ripemd160": "^2.0.0",
+    "@types/secp256k1": "^4.0.2",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
+    "eslint": "^7.26.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-airbnb-typescript": "^12.3.1",
+    "eslint-plugin-import": "^2.23.1",
+    "prettier": "^2.3.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  }
+}
