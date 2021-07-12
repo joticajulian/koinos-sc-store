@@ -230,43 +230,56 @@ export class KoinosSCMicroservice {
 
   async start() {
     await db.open();
-    const connection = await amqp.connect("amqp://guest:guest@localhost:5672/");
-    const channel = await connection.createChannel();
-    const exchange = "koinos.event";
-    channel.assertExchange(exchange, "topic", { durable: true });
-    log(`Waiting for messages in ${exchange}`);
+    await this.amqpConnection();
+  }
 
-    const q1 = await channel.assertQueue("", { exclusive: true });
-    channel.bindQueue(q1.queue, exchange, "koinos.block.accept");
-    channel.consume(
-      q1.queue,
-      (msg) => {
-        const blockAccepted = JSON.parse(
-          msg.content.toString()
-        ) as BlockAcceptedJSON;
-        log(`Block accepted: ${blockAccepted.block.header.height}`);
-        this.processPendingBlock(blockAccepted.block);
-      },
-      {
-        noAck: true,
-      }
-    );
+  async amqpConnection() {
+    try {
+      const connection = await amqp.connect(
+        "amqp://guest:guest@localhost:5672/"
+      );
+      const channel = await connection.createChannel();
+      const exchange = "koinos.event";
+      channel.assertExchange(exchange, "topic", { durable: true });
+      log(`Waiting for messages in ${exchange}`);
 
-    const q2 = await channel.assertQueue("", { exclusive: true });
-    channel.bindQueue(q2.queue, exchange, "koinos.block.irreversible");
-    channel.consume(
-      q2.queue,
-      (msg) => {
-        const blockIrreversible = JSON.parse(
-          msg.content.toString()
-        ) as BlockIrreversibleJSON;
-        log(`Block irreversible: ${blockIrreversible.topology.height}`);
-        this.setBlockIrreversible(blockIrreversible);
-      },
-      {
-        noAck: true,
-      }
-    );
+      const q1 = await channel.assertQueue("", { exclusive: true });
+      channel.bindQueue(q1.queue, exchange, "koinos.block.accept");
+      channel.consume(
+        q1.queue,
+        (msg) => {
+          const blockAccepted = JSON.parse(
+            msg.content.toString()
+          ) as BlockAcceptedJSON;
+          log(`Block accepted: ${blockAccepted.block.header.height}`);
+          this.processPendingBlock(blockAccepted.block);
+        },
+        {
+          noAck: true,
+        }
+      );
+
+      const q2 = await channel.assertQueue("", { exclusive: true });
+      channel.bindQueue(q2.queue, exchange, "koinos.block.irreversible");
+      channel.consume(
+        q2.queue,
+        (msg) => {
+          const blockIrreversible = JSON.parse(
+            msg.content.toString()
+          ) as BlockIrreversibleJSON;
+          log(`Block irreversible: ${blockIrreversible.topology.height}`);
+          this.setBlockIrreversible(blockIrreversible);
+        },
+        {
+          noAck: true,
+        }
+      );
+    } catch (error) {
+      log(`Error: ${(error as Error).message}`);
+      log("Trying again in 3 seconds");
+      setTimeout(() => this.amqpConnection(), 3000);
+      return;
+    }
   }
 }
 

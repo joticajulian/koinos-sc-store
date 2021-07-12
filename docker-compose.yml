@@ -1,0 +1,7 @@
+version: "3.7"
+
+services:
+  sc-store:
+    build: .
+    volumes:
+      - "./database2:/database"

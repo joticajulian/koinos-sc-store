@@ -1,6 +1,16 @@
 {
+  "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
+    "lib": ["es2017", "dom"],
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "esModuleInterop": true,
+    "declaration": false,
+    "sourceMap": true,
+    "incremental": true,
+    "strict": false,
     "outDir": "./dist",
     "baseUrl": "./"
   },
