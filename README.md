@@ -25,15 +25,13 @@ Include a new service in the docker compose of your node and define the path to 
 
 ```yaml
 services:
-  amqp:
-    ...
-  chain:   
-    ...
+  amqp: ...
+  chain: ...
   sc-store:
     build: ../koinos-sc-store
     depends_on:
-         - amqp
-         - block_store
+      - amqp
+      - block_store
     volumes:
       - "./database:/database"
 ```
