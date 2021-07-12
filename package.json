@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "ts-node app.ts",
+    "build": "rimraf dist && tsc --build",
+    "start": "node dist/index",
+    "start:dev": "ts-node index.ts",
     "eslint": "eslint . --fix --ext .ts",
     "lint:tsc": "tsc --noEmit --incremental false",
     "test": "echo \"Error: no test specified\" && exit 1"

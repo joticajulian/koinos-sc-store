@@ -20,7 +20,7 @@ export async function open() {
     });
   });
 
-  try{
+  try {
     totalContracts = await getNumber(KEY_TOTAL_CONTRACTS);
   } catch (error) {
     log("Initializing total contracts = 0");
@@ -28,7 +28,7 @@ export async function open() {
     totalContracts = 0;
   }
 
-  try{
+  try {
     blockHeight = await getNumber(KEY_BLOCK_HEIGHT);
   } catch (error) {
     log("Initializing block height = 0");
@@ -126,7 +126,16 @@ export async function getContractById(id: string) {
 
 export async function getContractByNumber(contractNumber: number) {
   if (contractNumber >= totalContracts)
-    throw new Error(`Contract number ${contractNumber} not Found. Total contracts: ${totalContracts}`);
+    throw new Error(
+      `Contract number ${contractNumber} not Found. Total contracts: ${totalContracts}`
+    );
   const id = await getString(`${PREFIX_CONTRACT_NUMBER}${contractNumber}`);
   return getContractById(id);
 }
+
+/*
+(async () => {
+  await open();
+  const a = await getContractByNumber(2);
+  console.log(a);
+})()*/

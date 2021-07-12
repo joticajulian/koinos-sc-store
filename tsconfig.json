@@ -1,5 +1,9 @@
 {
-    "compilerOptions": {
-      "esModuleInterop": true
-    }
-  }
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "baseUrl": "./"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
