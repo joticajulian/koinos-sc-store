@@ -12,10 +12,6 @@ const PREFIX_CONTRACT_ID = "C";
 let totalContracts = 0;
 let blockHeight = 0;
 
-export interface UnknownObject {
-  [x: string]: unknown;
-};
-
 export async function open() {
   await new Promise((resolve, reject) => {
     ld.open(null, (error: Error) => {
@@ -68,16 +64,16 @@ export async function del(key: string) {
   });
 }
 
-export async function putObject(key: string, value: UnknownObject) {
+export async function putObject(key: string, value: unknown) {
   const uint8array = new TextEncoder().encode(JSON.stringify(value));
   const buffer = Buffer.from(uint8array);
   return put(key, buffer);
 }
 
-export async function getObject(key: string): Promise<UnknownObject> {
+export async function getObject(key: string): Promise<unknown> {
   const buffer = await get(key);
   const str = new TextDecoder().decode(buffer);
-  return JSON.parse(str) as UnknownObject;
+  return JSON.parse(str);
 }
 
 export async function putString(key: string, str: string) {
@@ -104,7 +100,7 @@ export async function putBlockHeight(n: number) {
   blockHeight = n;
 }
 
-export async function getBlockHeight() {
+export function getBlockHeight() {
   return blockHeight;
 }
 
@@ -112,7 +108,7 @@ export async function getTotalContracts() {
   return totalContracts;
 }
 
-export async function appendContract(id: string, data: UnknownObject) {
+export async function appendContract(id: string, data: unknown) {
   await putObject(`${PREFIX_CONTRACT_ID}${id}`, data);
   const contractNumber = totalContracts;
   await putString(`${PREFIX_CONTRACT_NUMBER}${contractNumber}`, id);
@@ -120,7 +116,7 @@ export async function appendContract(id: string, data: UnknownObject) {
   await putNumber(KEY_TOTAL_CONTRACTS, totalContracts);
 }
 
-export async function updateContract(id: string, data: UnknownObject) {
+export async function updateContract(id: string, data: unknown) {
   return putObject(`${PREFIX_CONTRACT_ID}${id}`, data);
 }
 
