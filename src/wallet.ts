@@ -1,8 +1,9 @@
 import ripemd160 from "ripemd160";
 import bs58 from "bs58";
 import { sha256 } from "js-sha256";
+import crypto from "crypto";
 import * as secp256k1 from "secp256k1";
-import { Multihash, VariableBlob, VariableBlobLike } from "koinos-types2";
+import { Multihash, Transaction, VariableBlob, VariableBlobLike } from "koinos-types2";
 
 export function toUint8Array(hexString: string) {
   return new Uint8Array(
@@ -44,6 +45,9 @@ export class Wallet {
     this.publicKey = secp256k1.publicKeyCreate(this.privateKey, compressed);
     this.address = Wallet.bitcoinAddress(this.publicKey);
     this.wif = Wallet.bitcoinEncode(this.privateKey, "private", compressed);
+    const a = secp256k1.privateKeyVerify(this.privateKey);
+    console.log("verify private key");
+    console.log(a)
   }
 
   static bitcoinEncode(
@@ -107,12 +111,49 @@ export class Wallet {
       .digest("hex");
     return Wallet.bitcoinEncode(toUint8Array(hash160), "public");
   }
+
+  sign(input: string | Transaction ): {
+    id: Multihash;
+    signature: VariableBlob
+  } {
+    let hash: string;
+    if (typeof input === "string") {
+      hash = input;
+    } else {
+      hash = sha256(input.activeData.serialize().buffer);
+    }
+    let rv: {signature: Uint8Array, recid: number};
+    do {
+      const options = {data: crypto.randomBytes(32)};
+      rv = secp256k1.ecdsaSign(toUint8Array(hash), this.privateKey, options);
+    } while (!isCanonicalSignature(rv.signature))
+    const { signature, recid } = rv;
+    const sig = new VariableBlob(65);
+    sig.writeUint8(recid + 31);
+    sig.write(signature);
+    return {
+      id: new Multihash({
+        id: 0x12,
+        digest: `f${hash}`,
+      }),
+      signature: sig,
+    }
+  }
+}
+
+function isCanonicalSignature(signature: Uint8Array): boolean {
+  return (
+      !(signature[0] & 0x80) &&
+      !(signature[0] === 0 && !(signature[1] & 0x80)) &&
+      !(signature[32] & 0x80) &&
+      !(signature[32] === 0 && !(signature[33] & 0x80))
+  )
 }
 
 export function signer(
   signatureRec: VariableBlobLike,
   multihash: VariableBlobLike
-): string {
+): string {console.log("signer usando secp256k1")
   const sig = new VariableBlob(signatureRec);
   const hash = new Multihash(multihash);
   const recid = sig.buffer[0] >> 5;

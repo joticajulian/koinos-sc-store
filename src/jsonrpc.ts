@@ -4,7 +4,7 @@ import { BlockItemJSON, HeadInfoJSON } from "koinos-types2";
 //const url = "http://localhost:8080";
 const url = "http://45.56.104.152:8080";
 
-export async function jsonrpc(method: string, params: unknown) {
+export async function jsonrpc(method: string, params: unknown) {console.log({method, params})
   const response = await axios.post<{ result?: unknown; error?: unknown }>(
     url,
     {
