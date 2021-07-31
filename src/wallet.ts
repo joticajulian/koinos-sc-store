@@ -153,7 +153,7 @@ function isCanonicalSignature(signature: Uint8Array): boolean {
 export function signer(
   signatureRec: VariableBlobLike,
   multihash: VariableBlobLike
-): string {console.log("signer usando secp256k1")
+): string {
   const sig = new VariableBlob(signatureRec);
   const hash = new Multihash(multihash);
   const recid = sig.buffer[0] >> 5;
